@@ -1,0 +1,11 @@
+# Node modules
+node_modules/
+
+# TypeScript build outputs
+dist/
+
+# Logs
+*.log
+
+# Env files
+.env
