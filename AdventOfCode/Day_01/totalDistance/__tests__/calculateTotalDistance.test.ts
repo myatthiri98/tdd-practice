@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calculateTotalDistance } from '../calculateTotalDistance'
+import { calculateTotalDistance } from '../src/calculateTotalDistance'
 
 describe('calculateTotalDistance', () => {
   it.each([

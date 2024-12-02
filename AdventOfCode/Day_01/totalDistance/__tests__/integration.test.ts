@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { solve } from '../solve'
+import { solve } from '../src/solve'
 import { readFileSync } from 'fs'
 import path from 'path'
 

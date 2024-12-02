@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { parseInput } from '../parseInput'
+import { parseInput } from '../src/parseInput'
 
 describe('parseInput', () => {
   it('should parse space-separated number pairs', () => {
