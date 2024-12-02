@@ -15,7 +15,7 @@ describe('Day 1 - Total Distance Integration', () => {
   })
 
   it('should solve actual input', () => {
-    const inputPath = path.join(__dirname, '..', 'input.txt')
+    const inputPath = path.join(__dirname, '../src', 'input.txt')
     const input = readFileSync(inputPath, 'utf-8')
     const result = solve(input)
     expect(result).toBeGreaterThan(0)
