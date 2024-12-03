@@ -1,4 +1,4 @@
-# Day 2 - Problem 2: Contains Duplicate
+# Day 3 - Problem 2: Contains Duplicate
 
 ## Problem Description
 
