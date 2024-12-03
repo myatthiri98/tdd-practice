@@ -1,13 +1,10 @@
 export function sumOfValidMultiplications(input: string): number {
     const regex = /mul\((\d{1,3}),(\d{1,3})\)/g;
-    let match;
-    let sum = 0;
+    const matches = [...input.matchAll(regex)]; // Use matchAll to get all matches
 
-    while ((match = regex.exec(input)) !== null) {
+    return matches.reduce((sum, match) => {
         const x = parseInt(match[1], 10);
         const y = parseInt(match[2], 10);
-        sum += x * y;
-    }
-
-    return sum;
+        return sum + (x * y);
+    }, 0);
 }
