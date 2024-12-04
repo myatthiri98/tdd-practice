@@ -2,7 +2,9 @@
 
 ## Problem Description
 
-Given an integer array nums, return true if any value appears more than once in the array, otherwise return false.
+Given an array of strings strs, group all anagrams together into sublists. You may return the output in any order.
+
+An anagram is a string that contains the exact same characters as another string, but the order of the characters can be different.
 
 ## Time & Space Complexity
 
