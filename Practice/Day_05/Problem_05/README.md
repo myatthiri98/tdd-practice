@@ -1,4 +1,4 @@
-# Day 2 - Problem 2: Contains Duplicate
+# Day 5 - Problem 5: Group Anagrams
 
 ## Problem Description
 
