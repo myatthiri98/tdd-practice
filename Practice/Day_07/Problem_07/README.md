@@ -2,11 +2,11 @@
 
 ## Problem Description
 
-Given an array of strings strs, group all anagrams together into sublists. You may return the output in any order.
+Design an algorithm to encode a list of strings to a single string. The encoded string is then decoded back to the original list of strings.
 
-An anagram is a string that contains the exact same characters as another string, but the order of the characters can be different.
+Please implement encode and decode
 
 ## Time & Space Complexity
 
-- Time Complexity: O(1)
+- Time Complexity: O(m)
 - Space Complexity: O(1)
