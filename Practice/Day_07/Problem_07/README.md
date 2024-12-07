@@ -1,4 +1,4 @@
-# Day 2 - Problem 2: Contains Duplicate
+# Day 7 - Problem 7: encode and decode
 
 ## Problem Description
 
