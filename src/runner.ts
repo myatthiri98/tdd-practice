@@ -15,6 +15,7 @@ const solutionMap: Record<string, string> = {
   day6: 'AdventOfCode/Day_06/guard-patrol/src/index.ts',
   day7: 'AdventOfCode/Day_07/findValidEquations/src/index.ts',
   day8: 'AdventOfCode/Day_08/Unique Antinode/src/index.ts',
+  day9: 'AdventOfCode/Day_09/Disk Fragmenter/src/index.ts',
 }
 
 const solutionPath = solutionMap[solution.toLowerCase()]
