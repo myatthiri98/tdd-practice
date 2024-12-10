@@ -1,8 +1,8 @@
 import {
   parseInput,
   findAntennas,
-  calculateAntinodes,
-  countUniqueAntinodes,
+  calculateAntinodesPartTwo,
+  countUniqueAntinodesPartTwo,
 } from './resonantCollinearity'
 import fs from 'fs'
 
@@ -12,7 +12,7 @@ const input = fs.readFileSync(
 )
 const grid = parseInput(input)
 const antennas = findAntennas(grid)
-const antinodes = calculateAntinodes(antennas)
-const result = countUniqueAntinodes(antinodes)
+const antinodes = calculateAntinodesPartTwo(antennas)
+const result = countUniqueAntinodesPartTwo(antinodes)
 
 console.log(`Unique antinodes: ${result}`)

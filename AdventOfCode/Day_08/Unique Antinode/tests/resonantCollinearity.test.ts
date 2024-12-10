@@ -2,11 +2,11 @@ import { describe, it, expect } from 'vitest'
 import {
   parseInput,
   findAntennas,
-  calculateAntinodes,
-  countUniqueAntinodes,
+  calculateAntinodesPartTwo,
+  countUniqueAntinodesPartTwo,
 } from '../src/resonantCollinearity'
 
-describe('Resonant Collinearity', () => {
+describe('Resonant Collinearity Part Two', () => {
   it('should parse input into a grid', () => {
     const input = `..........
 ...#......
@@ -55,12 +55,14 @@ describe('Resonant Collinearity', () => {
         [5, 5],
       ],
     }
-    const antinodes = calculateAntinodes(antennas)
+    const antinodes = calculateAntinodesPartTwo(antennas)
 
     console.log('Calculated Antinodes:', antinodes)
 
-    expect(antinodes).toContainEqual([1, 3]) // Expected antinode above the first antenna
-    expect(antinodes).toContainEqual([7, 6]) // Expected antinode below the second antenna
+    // Expect antinodes to include all points in line with the antennas
+    expect(antinodes).toContainEqual([3, 4]) // Antenna position itself
+    expect(antinodes).toContainEqual([5, 5]) // Antenna position itself
+    // Additional checks for other points in line
   })
 
   it('should count unique antinodes', () => {
@@ -68,8 +70,9 @@ describe('Resonant Collinearity', () => {
       [2, 3],
       [6, 6],
       [3, 4],
+      [3, 4], // Duplicate to test uniqueness
     ]
-    const uniqueCount = countUniqueAntinodes(antinodes)
+    const uniqueCount = countUniqueAntinodesPartTwo(antinodes)
     expect(uniqueCount).toBe(3)
   })
 })

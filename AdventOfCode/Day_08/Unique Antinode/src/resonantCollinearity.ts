@@ -21,57 +21,56 @@ export function findAntennas(
   return antennas
 }
 
-export function calculateAntinodes(
+function areCollinear(
+  p1: [number, number],
+  p2: [number, number],
+  p3: [number, number],
+): boolean {
+  const [y1, x1] = p1
+  const [y2, x2] = p2
+  const [y3, x3] = p3
+
+  // Calculate area of triangle formed by three points
+  // If area is 0, points are collinear
+  return Math.abs(y1 * (x2 - x3) + y2 * (x3 - x1) + y3 * (x1 - x2)) === 0
+}
+
+export function calculateAntinodesPartTwo(
   antennas: Record<string, [number, number][]>,
 ): [number, number][] {
-  const antinodes: [number, number][] = []
+  const antinodes = new Set<string>()
 
+  // For each frequency group
   for (const positions of Object.values(antennas)) {
     if (positions.length < 2) continue
 
-    for (let i = 0; i < positions.length - 1; i++) {
-      for (let j = i + 1; j < positions.length; j++) {
-        const [y1, x1] = positions[i]
-        const [y2, x2] = positions[j]
+    // Check each point in the grid
+    for (let y = 0; y < 50; y++) {
+      for (let x = 0; x < 50; x++) {
+        const point: [number, number] = [y, x]
 
-        // Calculate vector between antennas
-        const dx = x2 - x1
-        const dy = y2 - y1
-        const dx_unit = dx / Math.sqrt(dx * dx + dy * dy)
-        const dy_unit = dy / Math.sqrt(dx * dx + dy * dy)
-
-        // Calculate distance between antennas
-        const distance = Math.sqrt(dx * dx + dy * dy)
-
-        if (distance === 0) continue
-
-        // First antinode: extend backwards from first antenna by half distance
-        const antinode1Y = Math.round(y1 - dy_unit * distance)
-        const antinode1X = Math.round(x1 - dx_unit * distance)
-        antinodes.push([antinode1Y, antinode1X])
-
-        // Second antinode: extend forwards from second antenna by half distance
-        const antinode2Y = Math.round(y2 + dy_unit * distance)
-        const antinode2X = Math.round(x2 + dx_unit * distance)
-        antinodes.push([antinode2Y, antinode2X])
-
-        console.log(`Antennas: [${y1},${x1}] to [${y2},${x2}]`)
-        console.log(`Distance: ${distance}`)
-        console.log(`Antinode 1: [${antinode1Y},${antinode1X}]`)
-        console.log(`Antinode 2: [${antinode2Y},${antinode2X}]`)
+        // Count how many pairs of antennas this point is collinear with
+        for (let i = 0; i < positions.length; i++) {
+          for (let j = i + 1; j < positions.length; j++) {
+            if (areCollinear(positions[i], positions[j], point)) {
+              antinodes.add(`${y},${x}`)
+              break
+            }
+          }
+        }
       }
     }
   }
 
-  return antinodes
+  // Convert back to array of coordinates
+  return Array.from(antinodes).map((str) => {
+    const [y, x] = str.split(',').map(Number)
+    return [y, x]
+  })
 }
 
-export function countUniqueAntinodes(antinodes: [number, number][]): number {
-  // Filter out antinodes that are outside the grid bounds
-  const validAntinodes = antinodes.filter(
-    ([y, x]) => y >= 0 && y < 50 && x >= 0 && x < 50,
-  )
-
-  // Count unique positions
-  return new Set(validAntinodes.map(([y, x]) => `${y},${x}`)).size
+export function countUniqueAntinodesPartTwo(
+  antinodes: [number, number][],
+): number {
+  return new Set(antinodes.map(([y, x]) => `${y},${x}`)).size
 }
