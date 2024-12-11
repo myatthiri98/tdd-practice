@@ -5,7 +5,7 @@ import {
 } from '../src/diskFragmenter'
 import { describe, it, expect } from 'vitest'
 
-interface Block {
+type Block = {
   type: 'file' | 'space'
   size: number
   id?: number
