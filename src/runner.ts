@@ -19,6 +19,7 @@ const solutionMap: Record<string, string> = {
   day10: 'AdventOfCode/Day_10/lavaIsland/src/index.ts',
   day11: 'AdventOfCode/Day_11/Plutonian Pebbles/src/index.ts',
   day12: 'AdventOfCode/Day_12/Garden Groups/src/index.ts',
+  day13: 'AdventOfCode/Day_13/Claw Contraption/src/index.ts',
 }
 
 const solutionPath = solutionMap[solution.toLowerCase()]
