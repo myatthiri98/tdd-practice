@@ -1,7 +1,6 @@
 type Direction = 'N' | 'E' | 'S' | 'W'
 type Position = { x: number; y: number; dir: Direction; cost: number }
 
-// Parse the input grid and find start and end positions
 export function parseGrid(input: string[]): {
   grid: string[][]
   start: Position
@@ -13,7 +12,7 @@ export function parseGrid(input: string[]): {
 
   for (let y = 0; y < grid.length; y++) {
     for (let x = 0; x < grid[y].length; x++) {
-      if (grid[y][x] === 'S') start = { x, y, dir: 'E', cost: 0 } // Fixed initial cost to 0
+      if (grid[y][x] === 'S') start = { x, y, dir: 'E', cost: 0 }
       if (grid[y][x] === 'E') end = { x, y }
     }
   }
@@ -62,79 +61,106 @@ export function getMoves(position: Position, grid: string[][]): Position[] {
   return moves
 }
 
-type PathInfo = {
-  minCost: number
-  bestPathTiles: Set<string>
+type QueueEntry = {
+  position: Position
+  path: string[]
 }
 
-type PathMap = Map<
-  string,
-  {
-    cost: number
-    path: Set<string>
-  }
->
-
-export function findOptimalPaths(input: string[]): PathInfo {
+export function findOptimalPaths(input: string[]): {
+  minCost: number
+  bestPathTiles: Set<string>
+} {
   const { grid, start, end } = parseGrid(input)
-  const queue: Position[] = [start]
-  const visited = new Map<string, number>() // position -> min cost
-  const positionPaths = new Map<string, Set<string>>() // position -> set of positions in paths to here
-
-  const encodePos = (x: number, y: number) => `${x},${y}`
+  const queue: QueueEntry[] = [
+    {
+      position: start,
+      path: [`${start.x},${start.y}`],
+    },
+  ]
+  const visited = new Map<string, Map<string, number>>() // state -> (pathKey -> cost)
+  const bestPathTiles = new Set<string>()
   let minCost = Infinity
+  let optimalPaths: Set<string> = new Set()
 
-  // Initialize start position
-  const startPos = encodePos(start.x, start.y)
-  visited.set(startPos, 0)
-  positionPaths.set(startPos, new Set([startPos]))
+  const getStateKey = (pos: Position) => `${pos.x},${pos.y},${pos.dir}`
+  const getPathKey = (path: string[]) => path.join('|')
+
+  // Initialize visited map for start state
+  visited.set(
+    getStateKey(start),
+    new Map([[getPathKey([`${start.x},${start.y}`]), 0]]),
+  )
 
   while (queue.length > 0) {
-    queue.sort((a, b) => a.cost - b.cost)
-    const current = queue.shift()!
+    // Sort by cost to process lowest cost paths first
+    queue.sort((a, b) => a.position.cost - b.position.cost)
+    const { position: current, path: currentPath } = queue.shift()!
 
+    // Skip if this path can't possibly be optimal
     if (current.cost > minCost) continue
 
-    const currentPos = encodePos(current.x, current.y)
-    const currentPath = positionPaths.get(currentPos)!
-
+    // If we've reached the end
     if (current.x === end.x && current.y === end.y) {
-      minCost = Math.min(minCost, current.cost)
+      if (current.cost <= minCost) {
+        if (current.cost < minCost) {
+          // New minimum found, clear previous paths
+          minCost = current.cost
+          optimalPaths.clear()
+        }
+        // Record this path as optimal
+        optimalPaths.add(getPathKey(currentPath))
+        // Add all tiles from this path to the set
+        currentPath.forEach((pos) => bestPathTiles.add(pos))
+      }
       continue
     }
 
+    // Try all possible moves
     for (const next of getMoves(current, grid)) {
-      const nextPos = encodePos(next.x, next.y)
-      const existingCost = visited.get(nextPos)
+      const nextState = getStateKey(next)
+      const nextPos = `${next.x},${next.y}`
+      const nextPath = [...currentPath]
+      if (!nextPath.includes(nextPos)) {
+        nextPath.push(nextPos)
+      }
+      const pathKey = getPathKey(nextPath)
 
-      if (existingCost === undefined || next.cost <= existingCost) {
-        visited.set(nextPos, next.cost)
+      // Get or initialize the cost map for this state
+      let stateCosts = visited.get(nextState)
+      if (!stateCosts) {
+        stateCosts = new Map()
+        visited.set(nextState, stateCosts)
+      }
 
-        // Create or update path to this position
-        const nextPath = new Set(currentPath)
-        nextPath.add(nextPos)
-        positionPaths.set(nextPos, nextPath)
+      // Check if this path is worth exploring
+      let shouldExplore = true
+      for (const [existingPathKey, existingCost] of stateCosts) {
+        if (existingCost < next.cost) {
+          shouldExplore = false
+          break
+        }
+      }
 
-        queue.push(next)
+      if (shouldExplore) {
+        // Record this path's cost
+        stateCosts.set(pathKey, next.cost)
+
+        // Add to queue for further exploration
+        queue.push({
+          position: next,
+          path: nextPath,
+        })
       }
     }
-  }
-
-  // Collect all positions that are part of paths reaching the end with minimum cost
-  const bestPathTiles = new Set<string>()
-  const endPos = encodePos(end.x, end.y)
-  if (positionPaths.has(endPos)) {
-    positionPaths.get(endPos)!.forEach((pos) => bestPathTiles.add(pos))
   }
 
   return { minCost, bestPathTiles }
 }
 
-export function countOptimalPathTiles(input: string[]): number {
-  const { bestPathTiles } = findOptimalPaths(input)
-  return bestPathTiles.size
-}
-
 export function bfsSolveMaze(input: string[]): number {
   return findOptimalPaths(input).minCost
+}
+
+export function countOptimalPathTiles(input: string[]): number {
+  return findOptimalPaths(input).bestPathTiles.size
 }
