@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs'
-import { findShortestPath } from './shortestPath'
+import { findFirstBlockingByte, findShortestPath } from './shortestPath'
 
 // Function to read and parse byte positions from a file
 function readBytePositions(filePath: string): [number, number][] {
@@ -24,3 +24,9 @@ console.log('Byte positions:', bytePositions)
 const result = findShortestPath(gridSize, bytePositions)
 
 console.log('Shortest path steps:', result)
+
+// Usage:
+const part2Result = findFirstBlockingByte(71, bytePositions)
+console.log(
+  `First blocking byte coordinates: ${part2Result[0]},${part2Result[1]}`,
+)
