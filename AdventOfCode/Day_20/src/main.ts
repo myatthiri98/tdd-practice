@@ -1,7 +1,6 @@
 import { findStartAndEnd, parseInput } from './parser'
 import { findCheats } from './solver'
 
-// src/main.ts
 export function solve(input: string): number {
   if (!input || input === '...') return 0
 

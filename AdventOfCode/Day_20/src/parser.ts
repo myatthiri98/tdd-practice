@@ -1,6 +1,5 @@
 import { Grid, Point } from './types'
 
-// src/parser.ts
 export function parseInput(input: string): Grid {
   return input.split('\n').map((line) => line.split(''))
 }

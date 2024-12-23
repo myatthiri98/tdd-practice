@@ -1,4 +1,3 @@
-import { findStartAndEnd } from './parser'
 import { findShortestPath } from './pathfinder'
 import { Grid, Point } from './types'
 
@@ -9,63 +8,51 @@ export function findCheats(
 ): Map<number, number> {
   const normalTime = findShortestPath(grid, start, end)
   const cheats = new Map<number, number>()
+  const seen = new Set<string>()
 
   for (let y = 0; y < grid.length; y++) {
     for (let x = 0; x < grid[0].length; x++) {
-      if (grid[y][x] === '.' || grid[y][x] === 'S') {
+      if (grid[y][x] !== '#') {
         const startPoint = { x, y }
-        const directions = [
-          [
-            [0, 1],
-            [0, 2],
-          ],
-          [
-            [0, -1],
-            [0, -2],
-          ],
-          [
-            [1, 0],
-            [2, 0],
-          ],
-          [
-            [-1, 0],
-            [-2, 0],
-          ],
-          [
-            [1, 1],
-            [2, 2],
-          ],
-          [
-            [-1, -1],
-            [-2, -2],
-          ],
-          [
-            [1, -1],
-            [2, -2],
-          ],
-          [
-            [-1, 1],
-            [-2, 2],
-          ],
+        const timeToStart = findShortestPath(grid, start, startPoint)
+        if (timeToStart === Infinity) continue
+
+        // Try straight lines and diagonals
+        const moves = [
+          [0, 1],
+          [0, 2], // Down
+          [0, -1],
+          [0, -2], // Up
+          [1, 0],
+          [2, 0], // Right
+          [-1, 0],
+          [-2, 0], // Left
         ]
 
-        for (const [dir1, dir2] of directions) {
-          const endPoint = {
-            x: startPoint.x + dir2[0],
-            y: startPoint.y + dir2[1],
+        for (let i = 0; i < moves.length; i += 2) {
+          const mid = {
+            x: startPoint.x + moves[i][0],
+            y: startPoint.y + moves[i][1],
           }
 
-          if (isValidCheatEndPoint(grid, endPoint)) {
-            const timeToStart = findShortestPath(grid, start, startPoint)
-            const timeFromEnd = findShortestPath(grid, endPoint, end)
+          const endPoint = {
+            x: startPoint.x + moves[i + 1][0],
+            y: startPoint.y + moves[i + 1][1],
+          }
 
-            if (timeToStart !== Infinity && timeFromEnd !== Infinity) {
-              const totalTime = timeToStart + 2 + timeFromEnd // 2 for the cheat moves
-              if (totalTime < normalTime) {
-                const timeSaved = normalTime - totalTime
-                cheats.set(timeSaved, (cheats.get(timeSaved) || 0) + 1)
-              }
-            }
+          if (!isValidEndPoint(grid, endPoint)) continue
+
+          const key = `${startPoint.x},${startPoint.y}-${endPoint.x},${endPoint.y}`
+          if (seen.has(key)) continue
+          seen.add(key)
+
+          const timeFromEnd = findShortestPath(grid, endPoint, end)
+          if (timeFromEnd === Infinity) continue
+
+          const totalTime = timeToStart + 2 + timeFromEnd
+          if (totalTime < normalTime) {
+            const timeSaved = normalTime - totalTime
+            cheats.set(timeSaved, (cheats.get(timeSaved) || 0) + 1)
           }
         }
       }
@@ -75,14 +62,12 @@ export function findCheats(
   return cheats
 }
 
-function isValidCheatEndPoint(grid: Grid, point: Point): boolean {
-  if (
-    point.y < 0 ||
-    point.y >= grid.length ||
-    point.x < 0 ||
-    point.x >= grid[0].length
-  ) {
-    return false
-  }
-  return grid[point.y][point.x] === '.' || grid[point.y][point.x] === 'E'
+function isValidEndPoint(grid: Grid, point: Point): boolean {
+  return (
+    point.y >= 0 &&
+    point.y < grid.length &&
+    point.x >= 0 &&
+    point.x < grid[0].length &&
+    grid[point.y][point.x] !== '#'
+  )
 }
