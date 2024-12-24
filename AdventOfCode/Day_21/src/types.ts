@@ -1,6 +1,6 @@
 export type Position = {
-  x: number
-  y: number
+  row: number
+  col: number
 }
 
 export type Keypad = {

@@ -7,7 +7,7 @@ export const NUMERIC_KEYPAD: Keypad = {
     ['1', '2', '3'],
     ['', '0', 'A'],
   ],
-  startPosition: { x: 1, y: 3 },
+  startPosition: { row: 3, col: 2 }, // Starting at 'A'
 }
 
 export const DIRECTIONAL_KEYPAD: Keypad = {
@@ -15,5 +15,5 @@ export const DIRECTIONAL_KEYPAD: Keypad = {
     ['', '^', 'A'],
     ['<', 'v', '>'],
   ],
-  startPosition: { x: 2, y: 0 },
+  startPosition: { row: 0, col: 2 }, // Starting at 'A'
 }

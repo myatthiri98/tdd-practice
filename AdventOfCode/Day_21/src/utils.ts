@@ -1,56 +1,74 @@
 import { Position, Keypad } from './types'
 
-export function isValidPosition(pos: Position, keypad: Keypad): boolean {
-  return (
-    pos.y >= 0 &&
-    pos.y < keypad.layout.length &&
-    pos.x >= 0 &&
-    pos.x < keypad.layout[pos.y].length &&
-    keypad.layout[pos.y][pos.x] !== ''
-  )
+export function isValidPosition(pos: Position, keypad: string[][]): boolean {
+  if (
+    pos.row < 0 ||
+    pos.row >= keypad.length ||
+    pos.col < 0 ||
+    pos.col >= keypad[pos.row].length
+  ) {
+    return false
+  }
+  return keypad[pos.row][pos.col].trim() !== ''
 }
-
 export function movePosition(pos: Position, direction: string): Position {
+  const newPos = { ...pos }
   switch (direction) {
     case '^':
-      return { ...pos, y: pos.y - 1 }
+      newPos.row--
+      break
     case 'v':
-      return { ...pos, y: pos.y + 1 }
+      newPos.row++
+      break
     case '<':
-      return { ...pos, x: pos.x - 1 }
+      newPos.col--
+      break
     case '>':
-      return { ...pos, x: pos.x + 1 }
-    default:
-      return pos
+      newPos.col++
+      break
   }
+  return newPos
 }
 
-export function findShortestPath(
+export function getDirectionsToTarget(
   start: Position,
-  target: Position,
-  keypad: Keypad,
+  targetChar: string,
+  keypad: string[][],
 ): string[] {
+  const queue: [Position, string[]][] = [[start, []]]
   const visited = new Set<string>()
-  const queue: { pos: Position; path: string[] }[] = [{ pos: start, path: [] }]
+
+  function findTarget(): Position | null {
+    for (let row = 0; row < keypad.length; row++) {
+      for (let col = 0; col < keypad[row].length; col++) {
+        if (keypad[row][col] === targetChar) {
+          return { row, col }
+        }
+      }
+    }
+    return null
+  }
+
+  const target = findTarget()
+  if (!target) return []
 
   while (queue.length > 0) {
-    const { pos, path } = queue.shift()!
-    const posKey = `${pos.x},${pos.y}`
+    const [currentPos, path] = queue.shift()!
+    const posKey = `${currentPos.row},${currentPos.col}`
 
-    if (pos.x === target.x && pos.y === target.y) {
+    if (currentPos.row === target.row && currentPos.col === target.col) {
       return path
     }
 
     if (visited.has(posKey)) continue
     visited.add(posKey)
 
-    for (const direction of ['^', 'v', '<', '>']) {
-      const newPos = movePosition(pos, direction)
-      if (isValidPosition(newPos, keypad)) {
-        queue.push({
-          pos: newPos,
-          path: [...path, direction],
-        })
+    // Try all possible directions
+    const directions = ['^', 'v', '<', '>']
+    for (const direction of directions) {
+      const nextPos = movePosition(currentPos, direction)
+      if (isValidPosition(nextPos, keypad)) {
+        queue.push([nextPos, [...path, direction]])
       }
     }
   }
