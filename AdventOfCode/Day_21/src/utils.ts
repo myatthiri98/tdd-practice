@@ -1,77 +1,69 @@
-import { Position, Keypad } from './types'
+import { Location } from './types'
+import { DIRECTIONS } from './constants'
 
-export function isValidPosition(pos: Position, keypad: string[][]): boolean {
-  if (
-    pos.row < 0 ||
-    pos.row >= keypad.length ||
-    pos.col < 0 ||
-    pos.col >= keypad[pos.row].length
-  ) {
-    return false
-  }
-  return keypad[pos.row][pos.col].trim() !== ''
-}
-export function movePosition(pos: Position, direction: string): Position {
-  const newPos = { ...pos }
-  switch (direction) {
-    case '^':
-      newPos.row--
-      break
-    case 'v':
-      newPos.row++
-      break
-    case '<':
-      newPos.col--
-      break
-    case '>':
-      newPos.col++
-      break
-  }
-  return newPos
-}
-
-export function getDirectionsToTarget(
-  start: Position,
-  targetChar: string,
-  keypad: string[][],
+export function movesBetweenPositions(
+  start: Location,
+  end: Location,
+  isKeypad: boolean = true,
 ): string[] {
-  const queue: [Position, string[]][] = [[start, []]]
-  const visited = new Set<string>()
-
-  function findTarget(): Position | null {
-    for (let row = 0; row < keypad.length; row++) {
-      for (let col = 0; col < keypad[row].length; col++) {
-        if (keypad[row][col] === targetChar) {
-          return { row, col }
-        }
-      }
-    }
-    return null
+  if (start.x === end.x && start.y === end.y) {
+    return ['a']
   }
 
-  const target = findTarget()
-  if (!target) return []
+  const [deltaX, deltaY] = start.delta(end)
+  const steps: string[] = []
 
-  while (queue.length > 0) {
-    const [currentPos, path] = queue.shift()!
-    const posKey = `${currentPos.row},${currentPos.col}`
+  if (deltaX < 0) {
+    steps.push('<'.repeat(Math.abs(deltaX)))
+  } else {
+    steps.push('>'.repeat(Math.abs(deltaX)))
+  }
 
-    if (currentPos.row === target.row && currentPos.col === target.col) {
-      return path
+  if (deltaY < 0) {
+    steps.push('^'.repeat(Math.abs(deltaY)))
+  } else {
+    steps.push('v'.repeat(Math.abs(deltaY)))
+  }
+
+  const validMoves: string[] = []
+  const allMoves = permutations(steps.join(''))
+
+  for (const perm of allMoves) {
+    let currentLocation = start
+    let valid = true
+
+    for (const move of perm) {
+      const direction = DIRECTIONS.get(move)!
+      currentLocation = currentLocation.add(direction)
+
+      if (
+        (isKeypad && currentLocation.x === 0 && currentLocation.y === 0) ||
+        (!isKeypad && currentLocation.x === 0 && currentLocation.y === 3)
+      ) {
+        valid = false
+        break
+      }
     }
 
-    if (visited.has(posKey)) continue
-    visited.add(posKey)
-
-    // Try all possible directions
-    const directions = ['^', 'v', '<', '>']
-    for (const direction of directions) {
-      const nextPos = movePosition(currentPos, direction)
-      if (isValidPosition(nextPos, keypad)) {
-        queue.push([nextPos, [...path, direction]])
-      }
+    if (valid) {
+      validMoves.push(perm + 'a')
     }
   }
 
-  return []
+  return Array.from(new Set(validMoves))
+}
+
+function* permutations(str: string): Generator<string> {
+  if (str.length <= 1) {
+    yield str
+    return
+  }
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i]
+    const remainingChars = str.slice(0, i) + str.slice(i + 1)
+    for (const perm of permutations(remainingChars)) {
+      yield char + perm
+    }
+  }
 }

@@ -1,9 +1,11 @@
-export type Position = {
-  row: number
-  col: number
-}
+export class Location {
+  constructor(public x: number, public y: number) {}
 
-export type Keypad = {
-  layout: string[][]
-  startPosition: Position
+  delta(other: Location): [number, number] {
+    return [other.x - this.x, other.y - this.y]
+  }
+
+  add(other: Location): Location {
+    return new Location(this.x + other.x, this.y + other.y)
+  }
 }
