@@ -28,6 +28,7 @@ const solutionMap: Record<string, string> = {
   day19: 'AdventOfCode/Day_19/src/main.ts',
   day20: 'AdventOfCode/Day_20/src/index.ts',
   day21: 'AdventOfCode/Day_21/src/index.ts',
+  day22: 'AdventOfCode/Day_22/src/index.ts',
 }
 
 const solutionPath = solutionMap[solution.toLowerCase()]
