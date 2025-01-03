@@ -1,17 +1,25 @@
-# Day 9 - Problem 9: Valid Sudoku
+# Day 10 - Problem 10: Longest Consecutive Sequence
 
-## Problem Description
+Longest Consecutive Sequence
+Given an array of integers nums, return the length of the longest consecutive sequence of elements that can be formed.
 
-You are given a a 9 x 9 Sudoku board board. A Sudoku board is valid if the following rules are followed:
+A consecutive sequence is a sequence of elements in which each element is exactly 1 greater than the previous element. The elements do not have to be consecutive in the original array.
 
-Each row must contain the digits 1-9 without duplicates.
-Each column must contain the digits 1-9 without duplicates.
-Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without duplicates.
-Return true if the Sudoku board is valid, otherwise return false
+You must write an algorithm that runs in O(n) time.
 
-Note: A board does not need to be full or be solvable to be valid.
+Example 1:
 
-## Time & Space Complexity
+Input: nums = [2,20,4,10,3,4,5]
 
-- Time Complexity: O(1)
-- Space Complexity: O(1)
+Output: 4
+Explanation: The longest consecutive sequence is [2, 3, 4, 5].
+
+Example 2:
+
+Input: nums = [0,3,2,5,4,6,1,1]
+
+Output: 7
+Constraints:
+
+0 <= nums.length <= 1000
+-10^9 <= nums[i] <= 10^9
