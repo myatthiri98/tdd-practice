@@ -1,17 +1,7 @@
-# Day 9 - Problem 9: Valid Sudoku
+# Day 11 - Problem 11: Valid Palindrome
 
 ## Problem Description
 
-You are given a a 9 x 9 Sudoku board board. A Sudoku board is valid if the following rules are followed:
+Given a string s, return true if it is a palindrome, otherwise return false.
 
-Each row must contain the digits 1-9 without duplicates.
-Each column must contain the digits 1-9 without duplicates.
-Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without duplicates.
-Return true if the Sudoku board is valid, otherwise return false
-
-Note: A board does not need to be full or be solvable to be valid.
-
-## Time & Space Complexity
-
-- Time Complexity: O(1)
-- Space Complexity: O(1)
+A palindrome is a string that reads the same forward and backward. It is also case-insensitive and ignores all non-alphanumeric characters.
