@@ -3,26 +3,24 @@ export function carFleet(
   position: number[],
   speed: number[],
 ): number {
-  const n = position.length
-  if (n === 0) return 0
+  // If there are no cars, return 0 fleets.
+  if (position.length === 0) return 0
 
-  // Pair up each car's position with its speed
-  const cars = position.map((pos, i) => [pos, speed[i]] as [number, number])
+  // Pair up each car's position with its speed, then sort them by position descending.
+  const cars = position
+    .map((pos, i) => ({ pos, spd: speed[i] }))
+    .sort((a, b) => b.pos - a.pos)
 
-  // Sort cars by starting position in descending order
-  cars.sort((a, b) => b[0] - a[0])
-
-  // Calculate the time each car takes to reach the target
-  const times = cars.map(([pos, spd]) => (target - pos) / spd)
-
+  // Calculate the time each car takes to reach the target and track fleets.
   let fleets = 0
-  let prevTime = 0
+  let lastFleetTime = 0
 
-  for (const time of times) {
-    // A new fleet is formed if the current car takes more time than the previous
-    if (time > prevTime) {
+  for (const { pos, spd } of cars) {
+    const timeToTarget = (target - pos) / spd
+    // If the current car takes more time than the last fleet's time, it's a new fleet.
+    if (timeToTarget > lastFleetTime) {
       fleets++
-      prevTime = time
+      lastFleetTime = timeToTarget
     }
   }
 
