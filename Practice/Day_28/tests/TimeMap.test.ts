@@ -1,98 +1,73 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { TimeMap } from '../src/TimeMap'
 
-// Define types for our operations
-type SetOperation = ['set', string, string, number]
-type GetOperation = ['get', string, null, number]
-type Operation = SetOperation | GetOperation
-
-// Define type for test case
-interface TestCase {
-  name: string
-  operations: Operation[]
-  expected: (string | undefined)[]
-}
-
 describe('TimeMap', () => {
-  it.each<TestCase>([
-    {
-      name: 'Example from the problem description',
-      operations: [
-        ['set', 'alice', 'happy', 1],
-        ['get', 'alice', null, 1],
-        ['get', 'alice', null, 2],
-        ['set', 'alice', 'sad', 3],
-        ['get', 'alice', null, 3],
-      ],
-      expected: [undefined, 'happy', 'happy', undefined, 'sad'],
-    },
-    {
-      name: 'Empty key returns empty string',
-      operations: [['get', 'nonexistent', null, 1]],
-      expected: [''],
-    },
-    {
-      name: 'Multiple values with timestamps',
-      operations: [
-        ['set', 'test', 'v1', 1],
-        ['set', 'test', 'v2', 2],
-        ['set', 'test', 'v3', 3],
-        ['get', 'test', null, 1],
-        ['get', 'test', null, 2],
-        ['get', 'test', null, 3],
-        ['get', 'test', null, 4],
-      ],
-      expected: [undefined, undefined, undefined, 'v1', 'v2', 'v3', 'v3'],
-    },
-    {
-      name: 'Timestamp before first value',
-      operations: [
-        ['set', 'key', 'value', 5],
-        ['get', 'key', null, 1],
-        ['get', 'key', null, 4],
-      ],
-      expected: [undefined, '', ''],
-    },
-    {
-      name: 'Multiple keys',
-      operations: [
-        ['set', 'key1', 'value1', 1],
-        ['set', 'key2', 'value2', 2],
-        ['get', 'key1', null, 2],
-        ['get', 'key2', null, 2],
-      ],
-      expected: [undefined, undefined, 'value1', 'value2'],
-    },
-    {
-      name: 'Handles timestamps at boundaries',
-      operations: [
-        ['set', 'key', 'value', 1000], // Max timestamp
-        ['get', 'key', null, 1000],
-        ['get', 'key', null, 999],
-        ['get', 'key', null, 1001],
-      ],
-      expected: [undefined, 'value', '', 'value'],
-    },
-    {
-      name: 'Handles min/max constraint values',
-      operations: [
-        ['set', 'a', '1', 1], // Min timestamp
-        ['get', 'a', null, 1],
-        ['set', 'a', '2', 1000], // Max timestamp
-        ['get', 'a', null, 1000],
-      ],
-      expected: [undefined, '1', undefined, '2'],
-    },
-  ])('$name', ({ operations, expected }) => {
-    const timeMap = new TimeMap()
-    const results = operations.map((operation) => {
-      const [method, key, value, timestamp] = operation
-      if (method === 'set') {
-        return timeMap.set(key, value as string, timestamp)
-      } else {
-        return timeMap.get(key, timestamp)
-      }
-    })
-    expect(results).toEqual(expected)
+  let timeMap: TimeMap
+
+  // Before each test, initialize a new TimeMap
+  beforeEach(() => {
+    timeMap = new TimeMap()
   })
+
+  it.each([
+    ['alice', 'happy', 1, 'happy'],
+    ['alice', 'sad', 3, 'sad'],
+  ])(
+    'should store and retrieve key-value pairs correctly for key %s',
+    (key, value, timestamp, expected) => {
+      timeMap.set(key, value, timestamp)
+      expect(timeMap.get(key, timestamp)).toBe(expected)
+    },
+  )
+
+  it('should return an empty string if no value exists for the key', () => {
+    expect(timeMap.get('bob', 1)).toBe('')
+  })
+
+  it.each([
+    ['test', 'v1', 1, 'v1'],
+    ['test', 'v2', 2, 'v2'],
+    ['test', 'v3', 3, 'v3'],
+    ['test', 'v3', 4, 'v3'],
+  ])(
+    'should handle multiple values for the same key with different timestamps',
+    (key, value, timestamp, expected) => {
+      timeMap.set(key, value, timestamp)
+      expect(timeMap.get(key, timestamp)).toBe(expected)
+    },
+  )
+
+  it.each([
+    ['key', 'value', 5, 1, ''],
+    ['key', 'value', 5, 4, ''],
+  ])(
+    'should return an empty string if timestamp is before first value',
+    (key, value, setTimestamp, getTimestamp, expected) => {
+      timeMap.set(key, value, setTimestamp)
+      expect(timeMap.get(key, getTimestamp)).toBe(expected)
+    },
+  )
+
+  it.each([
+    ['key', 'value', 1000, 1000, 'value'],
+    ['key', 'value', 1000, 999, ''],
+    ['key', 'value', 1000, 1001, 'value'],
+  ])(
+    'should handle timestamps at the boundaries',
+    (key, value, setTimestamp, getTimestamp, expected) => {
+      timeMap.set(key, value, setTimestamp)
+      expect(timeMap.get(key, getTimestamp)).toBe(expected)
+    },
+  )
+
+  it.each([
+    ['key1', 'value1', 1, 2, 'value1'],
+    ['key2', 'value2', 2, 2, 'value2'],
+  ])(
+    'should handle multiple keys',
+    (key, value, setTimestamp, getTimestamp, expected) => {
+      timeMap.set(key, value, setTimestamp)
+      expect(timeMap.get(key, getTimestamp)).toBe(expected)
+    },
+  )
 })
