@@ -2,43 +2,83 @@ export function findMedianSortedArrays(
   nums1: number[],
   nums2: number[],
 ): number {
-  // Ensure nums1 is the smaller array
+  // Validate input
+  validateInputArrays(nums1, nums2)
+
+  // Ensure nums1 is the smaller array for binary search optimization
   if (nums1.length > nums2.length) {
     ;[nums1, nums2] = [nums2, nums1]
   }
 
-  const total = nums1.length + nums2.length
-  const half = Math.floor(total / 2)
+  const totalLength = nums1.length + nums2.length
+  const halfLength = Math.floor(totalLength / 2)
 
   let left = 0
-  let right = nums1.length - 1
+  let right = nums1.length
 
-  while (true) {
-    const i = Math.floor((left + right) / 2) // Partition for nums1
-    const j = half - i - 2 // Partition for nums2
+  while (left <= right) {
+    const partitionX = Math.floor((left + right) / 2)
+    const partitionY = halfLength - partitionX
 
-    const nums1Left = i >= 0 ? nums1[i] : -Infinity
-    const nums1Right = i + 1 < nums1.length ? nums1[i + 1] : Infinity
-    const nums2Left = j >= 0 ? nums2[j] : -Infinity
-    const nums2Right = j + 1 < nums2.length ? nums2[j + 1] : Infinity
+    // Handle edge cases with boundary values
+    const maxLeftX =
+      partitionX > 0 ? nums1[partitionX - 1] : Number.NEGATIVE_INFINITY
+    const minRightX =
+      partitionX < nums1.length ? nums1[partitionX] : Number.POSITIVE_INFINITY
 
-    // Check if partition is valid
-    if (nums1Left <= nums2Right && nums2Left <= nums1Right) {
-      // If total length is odd, return the middle element
-      if (total % 2 === 1) {
-        return Math.min(nums1Right, nums2Right)
+    const maxLeftY =
+      partitionY > 0 ? nums2[partitionY - 1] : Number.NEGATIVE_INFINITY
+    const minRightY =
+      partitionY < nums2.length ? nums2[partitionY] : Number.POSITIVE_INFINITY
+
+    // Check if we have found the correct partition
+    if (maxLeftX <= minRightY && maxLeftY <= minRightX) {
+      // Odd total length
+      if (totalLength % 2 === 1) {
+        return Math.min(minRightX, minRightY)
       }
-      // If total length is even, return the average of the middle two elements
-      return (
-        (Math.max(nums1Left, nums2Left) + Math.min(nums1Right, nums2Right)) / 2
-      )
+
+      // Even total length
+      return (Math.max(maxLeftX, maxLeftY) + Math.min(minRightX, minRightY)) / 2
     }
 
-    // Adjust binary search
-    if (nums1Left > nums2Right) {
-      right = i - 1
+    // Adjust binary search range
+    if (maxLeftX > minRightY) {
+      right = partitionX - 1
     } else {
-      left = i + 1
+      left = partitionX + 1
     }
+  }
+
+  // This should never be reached with valid inputs
+  throw new Error('Input arrays are not sorted')
+}
+
+// Validation module
+function validateInputArrays(nums1: number[], nums2: number[]): void {
+  // Check for valid input arrays
+  if (!Array.isArray(nums1) || !Array.isArray(nums2)) {
+    throw new Error('Inputs must be arrays')
+  }
+
+  // Check length constraints
+  if (nums1.length > 1000 || nums2.length > 1000) {
+    throw new Error('Array length cannot exceed 1000')
+  }
+
+  // Check if arrays are sorted
+  const isSorted = (arr: number[]) =>
+    arr.every((val, idx) => idx === 0 || val >= arr[idx - 1])
+
+  if (!isSorted(nums1) || !isSorted(nums2)) {
+    throw new Error('Input arrays must be sorted in ascending order')
+  }
+
+  // Check value constraints
+  const isInValidRange = (arr: number[]) =>
+    arr.every((val) => val >= -1e6 && val <= 1e6)
+
+  if (!isInValidRange(nums1) || !isInValidRange(nums2)) {
+    throw new Error('Array values must be between -10^6 and 10^6')
   }
 }
