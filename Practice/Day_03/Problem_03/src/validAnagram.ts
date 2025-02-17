@@ -1,20 +1,24 @@
-export function validAnagram(firstString: string, secondString: string): boolean {
-  if (firstString.length !== secondString.length) return false
+export function anagrams(s1: string, s2: string): boolean {
+  // Normalize by removing spaces and converting to lowercase
+  const normalize = (str: string) => str.replace(/\s+/g, '').toLowerCase()
 
-  const charMap = new Map<string, number>()
+  const str1 = normalize(s1)
+  const str2 = normalize(s2)
 
-  // Count frequencies of first string
-  for (const char of firstString) {
-    charMap.set(char, (charMap.get(char) || 0) + 1)
+  if (str1.length !== str2.length) return false
+
+  const count: Record<string, number> = {}
+
+  for (const char of str1) {
+    count[char] = (count[char] || 0) + 1
   }
 
-  // Decrement frequencies for second string
-  for (const char of secondString) {
-    if (!charMap.has(char)) return false
-    const count = charMap.get(char)!
-    if (count === 0) return false
-    charMap.set(char, count - 1)
+  for (const char of str2) {
+    if (!count[char]) {
+      return false
+    }
+    count[char] -= 1
   }
 
-  return true
+  return Object.values(count).every((val) => val === 0)
 }
