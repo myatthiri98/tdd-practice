@@ -10,7 +10,8 @@ export const pairSum = (
 
     // Check if the complement exists in the previousNums object
     if (complement in previousNums) {
-      return [i, previousNums[complement]] // Return the current index and the stored index of the complement
+      // Return the indices in the expected order (matching the test cases)
+      return [previousNums[complement], i]
     }
 
     // Otherwise, store the current number and its index
