@@ -11,16 +11,27 @@ export class TreeNode {
 }
 
 export function kthSmallest(root: TreeNode | null, k: number): number {
-  const values: number[] = []
+  // Keep track of how many nodes we've visited
+  let count = 0
+  let result = 0
 
   function inOrder(node: TreeNode | null) {
     if (!node) return
+
+    // Traverse left subtree
     inOrder(node.left)
-    values.push(node.val)
+
+    // Process current node
+    count++
+    if (count === k) {
+      result = node.val
+      return
+    }
+
+    // Traverse right subtree
     inOrder(node.right)
   }
 
   inOrder(root)
-
-  return values[k - 1]
+  return result
 }
